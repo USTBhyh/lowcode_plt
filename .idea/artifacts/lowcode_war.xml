@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="lowcode:war">
+    <output-path>$PROJECT_DIR$/lowcode/target</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <module>lowcode</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="archive" name="lowcode-1.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="lowcode:war exploded" />
+    </root>
+  </artifact>
+</component>
