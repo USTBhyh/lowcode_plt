@@ -9,6 +9,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Projections;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import service.DataBaseService;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -83,9 +84,10 @@ public class DataShowController extends HttpServlet {
             System.out.println('\n');
         }
 
-//        MongoClient client = new MongoClient("127.0.0.1");
-        MongoClient client = new MongoClient("mongodb", 27017);
-        MongoDatabase db = client.getDatabase("test");
+// 创建连接
+        DataBaseService dataBaseService = new DataBaseService();
+        MongoClient client = dataBaseService.loginDateBase();
+        MongoDatabase db = dataBaseService.SelectDateBase();
 
         //query_list[{}]是所有非main_class的查询结果，为HashMap:_id->{所有数据串}
         HashMap<String, Document> dic = new HashMap<>();

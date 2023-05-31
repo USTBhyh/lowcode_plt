@@ -14,6 +14,7 @@ import org.bson.Document;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import service.DataBaseService;
 
 
 @WebServlet("/retrace.do")
@@ -25,14 +26,10 @@ public class retraceController extends HttpServlet {
         String userId = request.getParameter("userId");
         // 处理
         // 创建连接
-//        MongoClient client = new MongoClient("127.0.0.1");
-        MongoClient client = new MongoClient("mongodb", 27017);
-        // 打开数据库
-        MongoDatabase testDb = client.getDatabase("test");
-        // 获取集合
-//        MongoCollection<Document> userCollection = testDb.getCollection("student");
+        DataBaseService dataBaseService = new DataBaseService();
+        MongoClient client = dataBaseService.loginDateBase();
+        MongoDatabase testDb = dataBaseService.SelectDateBase();
 
-//        String jsonString = "[{\"field\":\"name\",\"type\":\"student\",\"value\":\"hyh\"},{\"field\":\"stu_no\",\"type\":\"student\",\"value\":\"\"},{\"field\":\"name\",\"type\":\"teacher\",\"value\":\"\"}]";
         JSONArray jsonArray = JSON.parseArray(userId);
 
         // 遍历，输出

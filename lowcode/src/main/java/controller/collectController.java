@@ -8,6 +8,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import service.DataBaseService;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -24,13 +25,9 @@ public class collectController extends HttpServlet {
         String collectData = request.getParameter("collectData");
         // 处理
         // 创建连接
-        MongoClient client = new MongoClient("mongodb", 27017);
-//        MongoClient client = new MongoClient("127.0.0.1");
-        // 使用默认的端口27017，如果是其他端口，可以指定：
-        // MongoClient client = new MongoClient("127.0.0.1:27018");
-
-        // 打开数据库
-        MongoDatabase testDb = client.getDatabase("test");
+        DataBaseService dataBaseService = new DataBaseService();
+        MongoClient client = dataBaseService.loginDateBase();
+        MongoDatabase testDb = dataBaseService.SelectDateBase();
 
         // 处理
         String jsonString = "[{\"field\":\"name\",\"type\":\"student\",\"value\":\"hyh\"},{\"field\":\"stu_no\",\"type\":\"student\",\"value\":\"420XXXX\"},{\"field\":\"name\",\"type\":\"teacher\",\"value\":\"XXX\"},{\"field\":\"tea_no\",\"type\":\"teacher\",\"value\":\"123XXX\"}]";

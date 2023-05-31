@@ -16,11 +16,10 @@ public class TypeSaveService {
 
         System.out.println(str);
 
-        // 创建 MongoDB 连接
-//        MongoClient client = new MongoClient("localhost", 27017);
-        MongoClient client = new MongoClient("mongodb", 27017);
-        // 获取数据库对象
-        MongoDatabase database = client.getDatabase("test");
+        // 创建连接
+        DataBaseService dataBaseService = new DataBaseService();
+        MongoClient client = dataBaseService.loginDateBase();
+        MongoDatabase database = dataBaseService.SelectDateBase();
 
         System.out.println("Connect to database successfully");
 

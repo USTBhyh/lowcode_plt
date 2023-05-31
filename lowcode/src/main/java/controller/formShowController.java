@@ -10,6 +10,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Sorts;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import service.DataBaseService;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -38,10 +39,9 @@ public class formShowController extends HttpServlet {
         // 分页
         //QueryParam[]               // 其他的查询字段
         // 创建连接
-//        MongoClient client = new MongoClient("127.0.0.1");
-        MongoClient client = new MongoClient("mongodb", 27017);
-        // 打开数据库
-        MongoDatabase testDb = client.getDatabase("test");
+        DataBaseService dataBaseService = new DataBaseService();
+        MongoClient client = dataBaseService.loginDateBase();
+        MongoDatabase testDb = dataBaseService.SelectDateBase();
         // 选中集合
         MongoCollection<Document> formTypes = testDb.getCollection("formUrl");
         // 按title模糊查询

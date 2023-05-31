@@ -6,12 +6,12 @@
 <!--    <welcome-file-list>-->
 <!--        <welcome-file>index.html</welcome-file>-->
 <!--    </welcome-file-list>-->
-    <servlet>
-        <servlet-name>publicFormController</servlet-name>
-        <servlet-class>controller.publicFormController</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>publicFormController</servlet-name>
-        <url-pattern>/form/*</url-pattern>
-    </servlet-mapping>
+<!--    <servlet>-->
+<!--        <servlet-name>publicFormController</servlet-name>-->
+<!--        <servlet-class>controller.publicFormController</servlet-class>-->
+<!--    </servlet>-->
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>publicFormController</servlet-name>-->
+<!--        <url-pattern>/user/submission/*</url-pattern>-->
+<!--    </servlet-mapping>-->
 </web-app>

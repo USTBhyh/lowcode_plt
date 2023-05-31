@@ -9,6 +9,7 @@ import javax.servlet.http.*;
 import javax.servlet.annotation.*;
 import java.io.IOException;
 import org.bson.Document;
+import service.DataBaseService;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import java.util.Date;
 import java.util.Random;
 import java.util.TimeZone;
 
-
+// 前端发布表单信息处理
 @WebServlet("/formUrl.do")
 public class formUrlController extends HttpServlet {
     @Override
@@ -24,34 +25,17 @@ public class formUrlController extends HttpServlet {
         request.setCharacterEncoding("utf-8");
         // 获取参数(需修改)
         String formData = request.getParameter("formData");
-//        String url = request.getParameter("url");
+        String url = request.getParameter("url");
         int titleIndex = formData.indexOf("title");
         int colonIndex = formData.indexOf(":", titleIndex);
         int commaIndex = formData.indexOf(",", colonIndex);
         String title = formData.substring(colonIndex+2, commaIndex-1);
-        // 定义固定的前缀URL
-        String prefixUrl = "http://localhost:8081/demo_war_exploded/form/";
-
-        // 定义随机生成的文件名
-        String str="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        Random random=new Random();
-        StringBuffer sb=new StringBuffer();
-        for(int i=0;i<10;i++){
-            int number=random.nextInt(62);
-            sb.append(str.charAt(number));
-        }
-        String randomFileName = sb.toString();
-        String randomUrl = prefixUrl + randomFileName + ".html";
-        // String title = request.getParameter("title");
-        System.out.println("randomUrl:"+randomUrl);
-        System.out.println("title:"+title);
 
         // 处理
         // 创建连接
-//        MongoClient client = new MongoClient("127.0.0.1");
-        MongoClient client = new MongoClient("mongodb", 27017);
-        // 打开数据库
-        MongoDatabase testDb = client.getDatabase("test");
+        DataBaseService dataBaseService = new DataBaseService();
+        MongoClient client = dataBaseService.loginDateBase();
+        MongoDatabase testDb = dataBaseService.SelectDateBase();
         // 获取集合
         MongoCollection<Document> urlCollection = testDb.getCollection("formUrl");
         // 构造文档
@@ -62,21 +46,17 @@ public class formUrlController extends HttpServlet {
                 .append("date","")
                 .append("answerNum",0)
                 .append("answer",new ArrayList<>());
-        newDocument.put("url", randomFileName+".html");
+        newDocument.put("url", url);
         newDocument.put("formData",formData);
         newDocument.put("title",title);
         // 获取时间
         // 获取当前时间
         Date date = new Date();
-        // 格式化日期为 "M月d日 H:mm" 格式
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("M月d日 H:mm");
-//        String formattedDate = dateFormat.format(date);
         newDocument.put("date", date);
-//        newDocument.put("m_date", date);
         // 插入
         urlCollection.insertOne(newDocument);
-        response.getWriter().print("Form released!"+randomUrl);
-//        response.sendRedirect("http://localhost:8081/demo_war_exploded/index.html#/admin/formFinish");
+        client.close();
+        response.getWriter().print("Form released!");
     }
 
     @Override

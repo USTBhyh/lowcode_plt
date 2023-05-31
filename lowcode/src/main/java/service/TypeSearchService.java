@@ -10,10 +10,9 @@ public class TypeSearchService {
     public String getType() throws Exception {
 
         // 创建连接
-//        MongoClient client = new MongoClient("127.0.0.1");
-        MongoClient client = new MongoClient("mongodb", 27017);
-        // 打开数据库
-        MongoDatabase testDb = client.getDatabase("test");
+        DataBaseService dataBaseService = new DataBaseService();
+        MongoClient client = dataBaseService.loginDateBase();
+        MongoDatabase testDb = dataBaseService.SelectDateBase();
 
         MongoCollection<Document> typeCollection = testDb.getCollection("registeredTypes");
 
