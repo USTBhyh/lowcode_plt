@@ -23,14 +23,14 @@ public class retraceController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("utf-8");
         // 获取参数(需修改)
-        String userId = request.getParameter("userId");
+        String content = request.getParameter("content");
         // 处理
         // 创建连接
         DataBaseService dataBaseService = new DataBaseService();
         MongoClient client = dataBaseService.loginDateBase();
         MongoDatabase testDb = dataBaseService.SelectDateBase();
 
-        JSONArray jsonArray = JSON.parseArray(userId);
+        JSONArray jsonArray = JSON.parseArray(content);
 
         // 遍历，输出
         for (int i = 0; i < jsonArray.size(); i++) {
@@ -42,7 +42,7 @@ public class retraceController extends HttpServlet {
         String mainType = "";
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
-            String type = jsonObject.getString("type");
+            String type = jsonObject.getString("schema");
             String field = jsonObject.getString("field");
             String value = jsonObject.getString("value");
             if(!value.equals(""))
@@ -61,7 +61,7 @@ public class retraceController extends HttpServlet {
 
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
-            String type = jsonObject.getString("type");
+            String type = jsonObject.getString("schema");
             String field = jsonObject.getString("field");
             String value = jsonObject.getString("value");
             if(!value.equals(""))

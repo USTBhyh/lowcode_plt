@@ -23,7 +23,7 @@ public class formUrlController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("utf-8");
-        // 获取参数(需修改)
+        //  获取参数
         String formData = request.getParameter("formData");
         String url = request.getParameter("url");
         int titleIndex = formData.indexOf("title");
