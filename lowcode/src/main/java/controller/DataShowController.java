@@ -171,7 +171,10 @@ public class DataShowController extends HttpServlet {
         // 拼接json串
         StringBuilder res = new StringBuilder("[");
         int f = 0;
-        FindIterable<Document> documents = db.getCollection(classes.get(0)).find().skip(page-1).limit(pageSize);
+        long count = 0;
+        FindIterable<Document> documents = db.getCollection(classes.get(0)).find().skip((page - 1) * pageSize).limit(pageSize);
+        count = db.getCollection(classes.get(0)).count();
+        System.out.println(count);
 //        System.out.println(documents.projection(Projections.fields(Projections.include(segments.get(0)))));
         System.out.println("test1");
         for (Document document : documents) {
@@ -180,8 +183,8 @@ public class DataShowController extends HttpServlet {
             f = 1;
             StringBuilder obj = new StringBuilder("[");
             int ff = 0;
-            System.out.println("******************");
-            System.out.println(document.keySet().toString());
+//            System.out.println("******************");
+//            System.out.println(document.keySet().toString());
             for (String key : document.keySet()) {
                 int ind = classes.indexOf(key);
                 if (ind != -1) {
@@ -214,10 +217,14 @@ public class DataShowController extends HttpServlet {
         res.append("]");
         System.out.println("**************");
         System.out.println(res);
+        JSONObject resultObject = new JSONObject();
+        resultObject.put("infoTotal", count);
+        resultObject.put("res", JSON.parse(String.valueOf(res)));
+        String resultJson = resultObject.toJSONString();
         // 输出
         response.setContentType("text/json;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            out.print(res);
+            out.print(resultJson);
             out.flush();
         } catch (IOException e) {
             e.printStackTrace();

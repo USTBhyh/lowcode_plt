@@ -53,26 +53,46 @@ public class DataStorageService {
         ArrayList<Map<ObjectId, String>> docIdMapList = new ArrayList<>();
         //  ObjectId   schema
 
-        for (int i = 0; i < jsonArray.size(); i++) {
-            JSONObject jsonObject = jsonArray.getJSONObject(i);
-            String field = jsonObject.getString("field");
-            String type = jsonObject.getString("schema");
-            String value = jsonObject.getString("value");
-            typeSet.add(type);
-            Map<String, String> typeMap = resultMap.get(type);
-            Map<String, String> newTypeMap = null;
-            if (typeMap == null) {
-                newTypeMap = new HashMap<>();
-                firstFieldMap.put(type, field);
-            } else {
-                newTypeMap = new HashMap<>(typeMap);
+        int i = 0;
+        int j = 0;
+        for (i = 0; i < jsonArray.size(); i=j) {
+            int flag = 0;
+            for(j = i; j  < jsonArray.size(); j++)
+            {
+                System.out.println(j);
+                JSONObject jsonObject = jsonArray.getJSONObject(j);
+                String field = jsonObject.getString("field");
+                String type = jsonObject.getString("schema");
+                String value = jsonObject.getString("value");
+                typeSet.add(type);
+                Map<String, String> newTypeMap = null;
+                Map<String, String> typeMap = resultMap.get(type);
+                if (typeMap == null) {
+                    newTypeMap = new HashMap<>();
+                    firstFieldMap.put(type, field);
+                }else {
+                    if(typeMap.containsKey(field)){
+                        resultList.add(new HashMap<>(resultMap));
+                        flag = 1;
+                        resultMap.remove(type);
+                        break;
+                    }
+                    newTypeMap = new HashMap<>(typeMap);
+                }
+                newTypeMap.put(field, value);
+                resultMap.put(type, newTypeMap);
             }
-            newTypeMap.put(field, value);
-            resultMap.put(type, newTypeMap);
-            resultList.add(new HashMap<>(resultMap));
+            if (flag==0)
+            {
+                resultList.add(new HashMap<>(resultMap));
+            }
+            System.out.println("***********************");
+            System.out.println(resultList.toString());
+            System.out.println("***********************");
         }
+
         // 对结果集进行切片操作
-        List<Map<String, Map<String, String>>> subList = resultList.subList(1, resultList.size());
+        List<Map<String, Map<String, String>>> subList = resultList.subList(0, resultList.size());
         // 信息存储
         for (Map<String, Map<String, String>> stringMapMap : subList) {
             for (String typeToSave : typeSet) {
@@ -127,7 +147,6 @@ public class DataStorageService {
                         tempCollection.replaceOne(queryById, document);
 
                     }else {
-
                         //如果没有，直接在数据模式上修改，然后插入
                         for (Map.Entry<String, String> entry : typeMap.entrySet()) {
                             String fieldToFind = entry.getKey(); // 要查找的 field
