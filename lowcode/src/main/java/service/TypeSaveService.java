@@ -25,6 +25,7 @@ public class TypeSaveService {
         System.out.println("Connect to database successfully");
 
         MongoCollection<Document> typeCollection = database.getCollection("registeredTypes");
+        typeCollection.deleteMany(new Document());
 
         JSONArray typeArray = JSON.parseArray(str);
 //        System.out.println(typeArray);

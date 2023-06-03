@@ -2,6 +2,7 @@ package controller;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import javax.servlet.annotation.*;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,16 +22,22 @@ import service.DataBaseService;
 public class retraceController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setCharacterEncoding("utf-8");
-        // 获取参数(需修改)
-        String content = request.getParameter("content");
         // 处理
+        BufferedReader reader = request.getReader();
+        StringBuilder strB = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            strB.append(line);
+        }
+        System.out.println(strB);
+        JSONObject dataJson = JSONObject.parseObject(strB.toString());
+        String content = dataJson.getString("content");
+        JSONArray jsonArray = JSON.parseArray(content);
         // 创建连接
+
         DataBaseService dataBaseService = new DataBaseService();
         MongoClient client = dataBaseService.loginDateBase();
         MongoDatabase testDb = dataBaseService.SelectDateBase();
-
-        JSONArray jsonArray = JSON.parseArray(content);
 
         // 遍历，输出
         for (int i = 0; i < jsonArray.size(); i++) {
@@ -114,12 +121,6 @@ public class retraceController extends HttpServlet {
             // 没有查询结果
             System.out.println("未查询到！");
         }
-
-        // 组装查询条件
-        // new Document("$and", Arrays.asList(
-        // new Document("field", new Document("$eq", field)),
-        // new Document("value", new Document("$eq", value))
-        // ));
 
         // 关闭连接
         client.close();

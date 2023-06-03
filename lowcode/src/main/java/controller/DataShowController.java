@@ -99,22 +99,24 @@ public class DataShowController extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        //接受解析json串
-//        StringBuilder jsonBuilder = new StringBuilder();
-//        String line;
-//        BufferedReader reader = request.getReader();
-//        while ((line = reader.readLine()) != null) {
-//            jsonBuilder.append(line);
-//        }
-//        String json = jsonBuilder.toString();
-//        System.out.println(json);
-//        ArrayList<Map<String, Object>> dataList = JSON.parseObject(json, new TypeReference<ArrayList<Map<String, Object>>>(){});
+        BufferedReader reader = request.getReader();
+        StringBuilder strB = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            strB.append(line);
+        }
+        System.out.println(strB);
+        JSONObject dataJson = JSONObject.parseObject(strB.toString());
 
-        String pageString = request.getParameter("page");
-        String pageSizeString = request.getParameter("pageSize");
+//        String submission = dataJson.getString("submission");
+        String pageString = dataJson.getString("page");
+        String pageSizeString = dataJson.getString("pageSize");
         int page = Integer.parseInt(pageString);
         int pageSize = Integer.parseInt(pageSizeString);
-        String json = request.getParameter("value");
+        String json = dataJson.getString("value");
+        System.out.println("*********************************");
+        System.out.println(json);
+        System.out.println("*********************************");
         JSONArray jsonArray = JSON.parseArray(json);
 
         //处理输入main_class主类(默认第一个)，classes[]涉及查询的类，segments[[]]每个类对应需要的属性
@@ -131,25 +133,6 @@ public class DataShowController extends HttpServlet {
 
         System.out.println(classes);
         System.out.println(segments);
-
-//        String segment;
-//        String type;
-//        int index = -1;
-//        //遍历dataList填充segments和classes
-//        for (Map<String, Object> map : dataList) {
-//            segment = map.get("segment").toString();
-//            type = map.get("type").toString();
-//            index = classes.indexOf(type);
-//            if (index != -1) {
-//                segments.get(index).add(segment);
-//            } else {
-//                ArrayList<String> tmp = new ArrayList<String>();
-//                tmp.add(segment);
-//                segments.add(tmp);
-//                classes.add(type);
-//            }
-//        }
-
 
         for (int i = 1; i < classes.size(); i++) {
             System.out.println(classes.get(i));
@@ -170,10 +153,10 @@ public class DataShowController extends HttpServlet {
 //            segments.get(i).add(0,"_id");
             FindIterable<Document> documents;
             if (segments.get(i).size() == 0)
-                documents = db.getCollection(classes.get(i)).find().skip(page).limit(pageSize);
+                documents = db.getCollection(classes.get(i)).find();
             else
                 documents = db.getCollection(classes.get(i)).find()
-                        .projection(Projections.fields(Projections.include(segments.get(i)))).skip(page).limit(pageSize);
+                        .projection(Projections.fields(Projections.include(segments.get(i))));
             for (Document document : documents) {
                 String id = document.getObjectId("_id").toHexString();
                 document.remove("_id");
@@ -181,13 +164,15 @@ public class DataShowController extends HttpServlet {
                 dic.put(id, document);
             }
         }
+        System.out.println("***************************************");
+        System.out.println(dic.toString());
+        System.out.println("***************************************");
 
         // 拼接json串
         StringBuilder res = new StringBuilder("[");
         int f = 0;
-        FindIterable<Document> documents = db.getCollection(classes.get(0)).find().skip(page).limit(pageSize);
-//        System.out.println(documents);
-//                .projection(Projections.fields(Projections.include(segments.get(0))));
+        FindIterable<Document> documents = db.getCollection(classes.get(0)).find().skip(page-1).limit(pageSize);
+//        System.out.println(documents.projection(Projections.fields(Projections.include(segments.get(0)))));
         System.out.println("test1");
         for (Document document : documents) {
             if (f == 1)
@@ -195,30 +180,22 @@ public class DataShowController extends HttpServlet {
             f = 1;
             StringBuilder obj = new StringBuilder("[");
             int ff = 0;
+            System.out.println("******************");
+            System.out.println(document.keySet().toString());
             for (String key : document.keySet()) {
                 int ind = classes.indexOf(key);
                 if (ind != -1) {
-////                    System.out.println("test2");
-//                    Document tmp = dic.get(document.get(key).toString());
-//                    for(String k:tmp.keySet()){
-//                        if(ff == 1)
-//                            obj.append(",");
-//                        ff = 1;
-//                        obj.append(concat(key, tmp.get(k).toString(), k, tmp.get(k) instanceof String));
-//                    }
-                    ArrayList<String>list = (ArrayList<String>)document.get(key);
-//                    ArrayList<ObjectId> list = (ArrayList<ObjectId>) document.get(key);
-//                    for (ObjectId o : list) {
-//                        String s = o.toString();
-                    for(String s :list){
-                        if (ff == 1)
+                    ArrayList<ObjectId> list = (ArrayList<ObjectId>)document.get(key);
+                    for(ObjectId o:list){
+                        String s = o.toString();
+                        if(ff == 1)
                             obj.append(",");
                         ff = 1;
                         obj.append("[");
                         int tf = 0;
                         Document tmp = dic.get(s);
-                        for (String k : tmp.keySet()) {
-                            if (tf == 1)
+                        for(String k:tmp.keySet()){
+                            if(tf == 1)
                                 obj.append(",");
                             tf = 1;
                             obj.append(concat(key, tmp.get(k).toString(), k, tmp.get(k) instanceof String));
@@ -235,6 +212,7 @@ public class DataShowController extends HttpServlet {
             res.append(obj).append("]");
         }
         res.append("]");
+        System.out.println("**************");
         System.out.println(res);
         // 输出
         response.setContentType("text/json;charset=UTF-8");
