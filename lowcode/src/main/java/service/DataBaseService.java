@@ -8,9 +8,9 @@ public class DataBaseService {
     public MongoClient loginDateBase()
     {
        // 本地
-//       return new MongoClient("127.0.0.1");
+       return new MongoClient("127.0.0.1");
        // docker部署
-       return new MongoClient("mongodb", 27017);
+//       return new MongoClient("mongodb", 27017);
     }
 
     public MongoDatabase SelectDateBase()

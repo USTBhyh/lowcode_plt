@@ -27,8 +27,8 @@ public class formUrlController extends HttpServlet {
         String formData = request.getParameter("formData");
         String url = request.getParameter("url");
         int titleIndex = formData.indexOf("title");
-        int colonIndex = formData.indexOf(":", titleIndex);
-        int commaIndex = formData.indexOf(",", colonIndex);
+        int colonIndex = formData.indexOf(':', titleIndex);
+        int commaIndex = formData.indexOf(',', colonIndex);
         String title = formData.substring(colonIndex+2, commaIndex-1);
 
         // 处理
