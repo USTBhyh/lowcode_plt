@@ -120,17 +120,19 @@ public class DataShowController extends HttpServlet {
         JSONArray jsonArray = JSON.parseArray(json);
 
         //处理输入main_class主类(默认第一个)，classes[]涉及查询的类，segments[[]]每个类对应需要的属性
-        ArrayList<String> classes = new ArrayList<String>();
-        ArrayList<ArrayList<String>> segments = new ArrayList<ArrayList<String>>();
+        ArrayList<String> classes = new ArrayList<>();
+        ArrayList<ArrayList<String>> segments = new ArrayList<>();
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             String mode = jsonObject.getString("schema");
             String fields = jsonObject.getString("fields");
             ArrayList<String> list = (ArrayList<String>) JSON.parseArray(fields, String.class);
-            classes.add(mode);
-            segments.add(list);
+            if(!mode.equals(""))
+            {
+                classes.add(mode);
+                segments.add(list);
+            }
         }
-
         System.out.println(classes);
         System.out.println(segments);
 
@@ -148,7 +150,7 @@ public class DataShowController extends HttpServlet {
         MongoDatabase db = dataBaseService.SelectDateBase();
 
         //query_list[{}]是所有非main_class的查询结果，为HashMap:_id->{所有数据串}
-        HashMap<String, Document> dic = new HashMap<String, Document>();
+        HashMap<String, Document> dic = new HashMap<>();
         for (int i = 1; i < classes.size(); i++) {
 //            segments.get(i).add(0,"_id");
             FindIterable<Document> documents;
@@ -160,6 +162,13 @@ public class DataShowController extends HttpServlet {
             for (Document document : documents) {
                 String id = document.getObjectId("_id").toHexString();
                 document.remove("_id");
+                if(segments.get(i).size() == 0)
+                {
+                    for(String s: document.keySet()){
+                        if(document.get(s) instanceof ObjectId || document.get(s) instanceof List)
+                            document.remove(s);
+                    }
+                }
                 System.out.println(document.toString());
                 dic.put(id, document);
             }
@@ -205,7 +214,9 @@ public class DataShowController extends HttpServlet {
                         }
                         obj.append("]");
                     }
-                } else if (segments.get(0).contains(key)) {
+                } else if (segments.get(0).size() == 0 || segments.get(0).contains(key)) {
+                    if(segments.get(0).size() == 0  && (document.get(key) instanceof ObjectId || document.get(key) instanceof List))
+                        continue;
                     if (ff == 1)
                         obj.append(",");
                     ff = 1;
